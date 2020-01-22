@@ -5,5 +5,7 @@
 * https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/
 
 # Docs
-##### Original lwjgl 3 documentation
+##### Original lwjgl 3 API documentation
 * https://javadoc.lwjgl.org/overview-summary.html
+##### Original opengl API documentation
+* http://docs.gl/
