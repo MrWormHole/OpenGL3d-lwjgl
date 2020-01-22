@@ -37,6 +37,18 @@ public class World {
         long window = Window.create(600,800,"Hello World");
         timer = new Timer();
 
+        try {
+            Shader shader = new Shader();
+            //do some work on Utils
+            shader.createVertexShader(Utils.loadResource("../shaders/vertex.vs"));
+            //do some work on Utils
+            shader.createFragmentShader(Utils.loadResource("../shaders/fragment.fs"));
+            shader.link();
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+
+
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, (_window, key, scancode, action, mods) -> {
             if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
