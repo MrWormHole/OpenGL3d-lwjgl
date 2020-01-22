@@ -16,7 +16,6 @@ public class Window {
             throw new RuntimeException("Failed to create the GLFW window");
         }
         return window;
-
     }
 
     public static void configure() {
@@ -31,7 +30,7 @@ public class Window {
         glfwDestroyWindow(window);
     }
 
-    public static void update() {
+    public static void clear() {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,

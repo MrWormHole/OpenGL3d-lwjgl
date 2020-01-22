@@ -11,15 +11,16 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class HelloWorld {
+public class World {
+
+    boolean running;
+    Timer timer;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
         init();
-        Window.update();
-        Window.destroy();
-        end();
+        gameLoop();
+        dispose();
     }
 
     private void init() {
@@ -32,7 +33,9 @@ public class HelloWorld {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
 
+        running = true;
         long window = Window.create(600,800,"Hello World");
+        timer = new Timer();
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, (_window, key, scancode, action, mods) -> {
@@ -68,14 +71,49 @@ public class HelloWorld {
         glfwShowWindow(window);
     }
 
-    private void end() {
+    private void gameLoop() {
+        float delta;
+        float accumulator = 0f;
+        float interval = 1f / 30f;
+        float alpha;
+
+        while(running) {
+            delta = timer.getDelta();
+            accumulator += delta;
+
+            processInputs();
+            while(accumulator >= interval) {
+                processUpdates(interval);
+                accumulator -= interval;
+            }
+            alpha = accumulator / interval;
+            processRenders(alpha);
+
+            Window.clear();
+        }
+    }
+
+    private void processInputs() {
+
+    }
+
+    private void processUpdates(float delta) {
+
+    }
+
+    private void processRenders(float delta) {
+
+    }
+
+    private void dispose() {
+        Window.destroy();
         // Terminate GLFW and free the error callback
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
 
     public static void main(String[] args) {
-        new HelloWorld().run();
+        new World().run();
     }
 
 }
