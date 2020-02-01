@@ -40,9 +40,9 @@ public class World {
         try {
             Shader shader = new Shader();
             //do some work on Utils
-            shader.createVertexShader(Utils.loadResource("../shaders/vertex.vs"));
+            shader.createVertexShader(Utils.loadResource("./shaders/vertex.vs"));
             //do some work on Utils
-            shader.createFragmentShader(Utils.loadResource("../shaders/fragment.fs"));
+            shader.createFragmentShader(Utils.loadResource("./shaders/fragment.fs"));
             shader.link();
         } catch(Exception e) {
             System.out.println(e);
