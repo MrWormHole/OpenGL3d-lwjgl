@@ -22,18 +22,19 @@ public class World {
 
     boolean running;
     Timer timer;
+    Window window;
+    Shader shader;
+    Mesh mesh;
+
+    float[] vertices = new float[]{
+            0.0f,  0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f
+    };
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
         init();
-
-        float[] vertices = new float[]{
-                0.0f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f
-        };
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         gameLoop();
         dispose();
     }
@@ -88,17 +89,21 @@ public class World {
         if (caps.OpenGL30) {
             System.out.println("WE ARE USING OPENGL 3 VERSIONS");
         }
+        // Set the clear color
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+
         try {
-            Shader shader = new Shader();
+            shader = new Shader();
             //do some work on Utils
             shader.createVertexShader(Utils.loadResource("./shaders/vertex.vs"));
             //do some work on Utils
             shader.createFragmentShader(Utils.loadResource("./shaders/fragment.fs"));
             shader.link();
-            shader.bind();
         } catch(Exception e) {
             System.out.println("ASDASD " + e);
         }
+
+        mesh = new Mesh(vertices);
     }
 
     private void gameLoop() {
@@ -107,7 +112,7 @@ public class World {
         float interval = 1f / 30f;
         float alpha;
 
-        while(running) {
+        while(running && !Window.windowShouldClose()) {
             delta = timer.getDelta();
             accumulator += delta;
 
@@ -132,7 +137,19 @@ public class World {
     }
 
     private void processRenders(float delta) {
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        shader.bind(); //for now testing only one shader
+
+        glBindVertexArray(mesh.getVaoId());
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+
+        // Restore state
+        glDisableVertexAttribArray(0);
+        glBindVertexArray(0);
+
+        shader.unbind(); //for now testing only one shader
+
+        Window.update();
     }
 
     private void dispose() {
