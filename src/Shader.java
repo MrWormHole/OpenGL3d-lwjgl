@@ -8,11 +8,14 @@ public class Shader {
     private int vertexShaderId;
     private int fragmentShaderId;
 
-    public Shader() throws Exception {
+    public Shader(String filePathVertex, String filePathFragment) throws Exception {
         programId = glCreateProgram();
         if(programId == 0) {
             throw new Exception("Could not create shader!");
         }
+        createVertexShader(Utils.loadResource(filePathVertex));
+        createFragmentShader(Utils.loadResource(filePathFragment));
+        link();
     }
 
     public void createVertexShader(String shaderCode) throws Exception {

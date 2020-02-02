@@ -1,3 +1,4 @@
+import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
@@ -25,6 +26,15 @@ public class Window {
     }
 
     public static void configure() {
+        // Setup an error callback. The default implementation
+        // will print the error message in System.err.
+        GLFWErrorCallback.createPrint(System.err).set();
+
+        // Initialize GLFW. Most GLFW functions will not work before doing this.
+        if ( !glfwInit() ) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
+
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_SAMPLES, 8); //8x anti-aliasing
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
@@ -80,6 +90,10 @@ public class Window {
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
+
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     public static boolean windowShouldClose() {
@@ -92,7 +106,6 @@ public class Window {
 
     public static void update() {
         glfwSwapBuffers(window); // swap the color buffers
-
         glfwPollEvents();
     }
 

@@ -19,7 +19,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class World {
 
-    boolean running;
+    boolean running = true;
     Timer timer;
     Shader shader;
     Mesh mesh;
@@ -38,28 +38,13 @@ public class World {
     }
 
     private void init() {
-        // Setup an error callback. The default implementation
-        // will print the error message in System.err.
-        GLFWErrorCallback.createPrint(System.err).set();
-
-        // Initialize GLFW. Most GLFW functions will not work before doing this.
-        if ( !glfwInit() ) {
-            throw new IllegalStateException("Unable to initialize GLFW");
-        }
-
-        running = true;
         Window.create(600,800,"Hello World");
         timer = new Timer();
 
         try {
-            shader = new Shader();
-            //do some work on Utils
-            shader.createVertexShader(Utils.loadResource("./shaders/vertex.vs"));
-            //do some work on Utils
-            shader.createFragmentShader(Utils.loadResource("./shaders/fragment.fs"));
-            shader.link();
+            shader = new Shader("./shaders/basic.vs","./shaders/basic.fs");
         } catch(Exception e) {
-            System.out.println(e);
+            System.out.println("Shader loading error: " + e);
         }
 
         mesh = new Mesh(vertices);
@@ -114,9 +99,6 @@ public class World {
 
     private void dispose() {
         Window.destroy();
-        // Terminate GLFW and free the error callback
-        glfwTerminate();
-        glfwSetErrorCallback(null).free();
     }
 
     public static void main(String[] args) {
