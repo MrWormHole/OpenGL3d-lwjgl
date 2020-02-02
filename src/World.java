@@ -13,7 +13,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL15.*;
 
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -22,7 +21,6 @@ public class World {
 
     boolean running;
     Timer timer;
-    Window window;
     Shader shader;
     Mesh mesh;
 
@@ -50,47 +48,8 @@ public class World {
         }
 
         running = true;
-        long window = Window.create(600,800,"Hello World");
+        Window.create(600,800,"Hello World");
         timer = new Timer();
-
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, (_window, key, scancode, action, mods) -> {
-            if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-                glfwSetWindowShouldClose(_window, true); // We will detect this in the rendering loop
-        });
-
-        // Get the thread stack and push a new frame
-        try ( MemoryStack stack = stackPush() ) {
-            IntBuffer pWidth = stack.mallocInt(1); // int*
-            IntBuffer pHeight = stack.mallocInt(1); // int*
-
-            // Get the window size passed to glfwCreateWindow
-            glfwGetWindowSize(window, pWidth, pHeight);
-
-            // Get the resolution of the primary monitor
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-            // Center the window
-            glfwSetWindowPos(
-                    window,
-                    (vidmode.width() - pWidth.get(0)) / 2,
-                    (vidmode.height() - pHeight.get(0)) / 2
-            );
-        } // the stack frame is popped automatically
-
-        // Make the OpenGL context current
-        glfwMakeContextCurrent(window);
-        // Enable v-sync
-        glfwSwapInterval(1);
-
-        // Make the window visible
-        glfwShowWindow(window);
-        GLCapabilities caps = GL.createCapabilities();
-        if (caps.OpenGL30) {
-            System.out.println("WE ARE USING OPENGL 3 VERSIONS");
-        }
-        // Set the clear color
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
         try {
             shader = new Shader();
@@ -100,7 +59,7 @@ public class World {
             shader.createFragmentShader(Utils.loadResource("./shaders/fragment.fs"));
             shader.link();
         } catch(Exception e) {
-            System.out.println("ASDASD " + e);
+            System.out.println(e);
         }
 
         mesh = new Mesh(vertices);
@@ -116,27 +75,27 @@ public class World {
             delta = timer.getDelta();
             accumulator += delta;
 
-            processInputs();
+            input();
             while(accumulator >= interval) {
-                processUpdates(interval);
+                update(interval);
                 accumulator -= interval;
             }
             alpha = accumulator / interval;
-            processRenders(alpha);
+            render(alpha);
 
             Window.clear();
         }
     }
 
-    private void processInputs() {
+    private void input() {
 
     }
 
-    private void processUpdates(float delta) {
+    private void update(float delta) {
 
     }
 
-    private void processRenders(float delta) {
+    private void render(float alpha) {
         shader.bind(); //for now testing only one shader
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
