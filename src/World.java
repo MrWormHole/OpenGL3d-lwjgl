@@ -138,6 +138,7 @@ public class World {
 
     private void processRenders(float delta) {
         shader.bind(); //for now testing only one shader
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
         glBindVertexArray(mesh.getVaoId());
         glEnableVertexAttribArray(0);

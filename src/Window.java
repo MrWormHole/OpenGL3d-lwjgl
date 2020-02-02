@@ -43,8 +43,6 @@ public class Window {
     }
 
     public static void update() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
         glfwSwapBuffers(window); // swap the color buffers
 
         glfwPollEvents();
