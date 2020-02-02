@@ -15,6 +15,7 @@ public class Window {
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
+        glfwMakeContextCurrent(window);
         return window;
     }
 
@@ -23,7 +24,7 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //major version of context is set to 3
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2); //minor version of context is set to 2
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); //minor version of context is set to 2
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //openGL core profile
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE); //good to have openGL forward compatibility
     }

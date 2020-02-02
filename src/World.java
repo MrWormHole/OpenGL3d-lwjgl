@@ -1,3 +1,4 @@
+import com.sun.prism.impl.VertexBuffer;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -7,7 +8,13 @@ import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
+
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL15.*;
+
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -19,6 +26,14 @@ public class World {
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
         init();
+
+        float[] vertices = new float[]{
+                0.0f,  0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f
+        };
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         gameLoop();
         dispose();
     }
@@ -36,18 +51,6 @@ public class World {
         running = true;
         long window = Window.create(600,800,"Hello World");
         timer = new Timer();
-
-        try {
-            Shader shader = new Shader();
-            //do some work on Utils
-            shader.createVertexShader(Utils.loadResource("./shaders/vertex.vs"));
-            //do some work on Utils
-            shader.createFragmentShader(Utils.loadResource("./shaders/fragment.fs"));
-            shader.link();
-        } catch(Exception e) {
-            System.out.println(e);
-        }
-
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, (_window, key, scancode, action, mods) -> {
@@ -81,6 +84,21 @@ public class World {
 
         // Make the window visible
         glfwShowWindow(window);
+        GLCapabilities caps = GL.createCapabilities();
+        if (caps.OpenGL30) {
+            System.out.println("WE ARE USING OPENGL 3 VERSIONS");
+        }
+        try {
+            Shader shader = new Shader();
+            //do some work on Utils
+            shader.createVertexShader(Utils.loadResource("./shaders/vertex.vs"));
+            //do some work on Utils
+            shader.createFragmentShader(Utils.loadResource("./shaders/fragment.fs"));
+            shader.link();
+            shader.bind();
+        } catch(Exception e) {
+            System.out.println("ASDASD " + e);
+        }
     }
 
     private void gameLoop() {
@@ -114,7 +132,7 @@ public class World {
     }
 
     private void processRenders(float delta) {
-
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
     private void dispose() {

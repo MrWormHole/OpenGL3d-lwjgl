@@ -1,4 +1,7 @@
-import static org.lwjgl.opengl.GL20C.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class Shader {
     private final int programId;
@@ -63,6 +66,7 @@ public class Shader {
     public void unbind() {
         glUseProgram(0);
     }
+
     public void cleanup() {
         unbind();
         if (programId != 0) {
