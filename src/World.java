@@ -24,10 +24,26 @@ public class World {
     Shader shader;
     Mesh mesh;
 
-    float[] vertices = new float[]{
-            0.0f,  0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f
+//    float[] positions = new float[]{
+//            -0.5f,  0.5f, 0.0f,
+//            -0.5f, -0.5f, 0.0f,
+//            0.5f, -0.5f, 0.0f,
+//            0.5f,  0.5f, 0.0f,
+//    };
+    float[] positions = new float[]{
+            -1.0f,  1.0f, 0.0f,
+            -1.0f, -1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
+            1.0f,  1.0f, 0.0f,
+    };
+    int[] indices = new int[]{
+            0, 1, 3, 3, 1, 2,
+    };
+    float[] colors = new float[]{
+            0.5f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f,
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.5f, 0.5f,
     };
 
     public void run() {
@@ -38,16 +54,16 @@ public class World {
     }
 
     private void init() {
-        Window.create(600,800,"Hello World");
+        Window.create(600,800,"World Experiments");
         timer = new Timer();
 
         try {
-            shader = new Shader("./shaders/basic.vs","./shaders/basic.fs");
+            shader = new Shader("./shaders/rainbow.vs","./shaders/rainbow.fs");
         } catch(Exception e) {
             System.out.println("Shader loading error: " + e);
         }
 
-        mesh = new Mesh(vertices);
+        mesh = new Mesh(positions,indices,colors);
     }
 
     private void gameLoop() {
@@ -81,17 +97,16 @@ public class World {
     }
 
     private void render(float alpha) {
-        shader.bind(); //for now testing only one shader
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
+        shader.bind(); //for now testing only one shader
         glBindVertexArray(mesh.getVaoId());
         glEnableVertexAttribArray(0);
-        glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+        glEnableVertexAttribArray(1);
+        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 
-        // Restore state
         glDisableVertexAttribArray(0);
         glBindVertexArray(0);
-
         shader.unbind(); //for now testing only one shader
 
         Window.update();
