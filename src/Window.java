@@ -13,14 +13,23 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private static long window;
+    private static String title;
+    private static int width;
+    private static int height;
+    private static boolean resized;
 
-    public static long create(int width, int height, String title) {
+    public static long create(int windowWidth, int windowHeight, String windowTitle, boolean isVsyncEnabled) {
         configure();
+        title = windowTitle;
+        width = windowWidth;
+        height = windowHeight;
+        resized = false;
+
         window = glfwCreateWindow(width, height, title, NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
-        makeCurrentContext();
+        makeCurrentContext(isVsyncEnabled);
         return window;
     }
 
@@ -44,7 +53,14 @@ public class Window {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE); //good to have openGL forward compatibility
     }
 
-    public static void makeCurrentContext() {
+    public static void makeCurrentContext(boolean isVsyncEnabled) {
+        // Setup resize callback
+        glfwSetFramebufferSizeCallback(window, (_window, windowWidth, windowHeight) -> {
+            width = windowWidth;
+            height = windowHeight;
+            resized = true;
+        });
+
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, (_window, key, scancode, action, mods) -> {
             if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
@@ -72,8 +88,11 @@ public class Window {
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
-        // Enable v-sync
-        glfwSwapInterval(1);
+
+        if(isVsyncEnabled) {
+            // Enable v-sync
+            glfwSwapInterval(1);
+        }
 
         // Make the window visible
         glfwShowWindow(window);
@@ -99,8 +118,25 @@ public class Window {
         return glfwWindowShouldClose(window);
     }
 
-    public boolean isKeyPressed(int keyCode) {
+    public static boolean isKeyPressed(int keyCode) {
         return glfwGetKey(window, keyCode) == GLFW_PRESS;
+    }
+
+
+    public static boolean isResized() {
+        return  resized;
+    }
+
+    public static void setResized(boolean value) {
+        resized = value;
+    }
+
+    public static int getWidth() {
+        return width;
+    }
+
+    public static int getHeight() {
+        return height;
     }
 
     public static void clear() {

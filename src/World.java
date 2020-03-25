@@ -54,7 +54,7 @@ public class World {
     }
 
     private void init() {
-        Window.create(600,800,"World Experiments");
+        Window.create(600,800,"World Experiments", true);
         timer = new Timer();
 
         try {
@@ -99,6 +99,11 @@ public class World {
     private void render(float alpha) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
+        if ( Window.isResized() ) {
+            glViewport(0, 0, Window.getWidth(), Window.getHeight());
+            Window.setResized(false);
+        }
+
         shader.bind(); //for now testing only one shader
         glBindVertexArray(mesh.getVaoId());
         glEnableVertexAttribArray(0);
@@ -112,7 +117,7 @@ public class World {
         Window.update();
     }
 
-    private void dispose() {
+    private static void dispose() {
         Window.destroy();
     }
 
