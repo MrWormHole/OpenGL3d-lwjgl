@@ -25,14 +25,9 @@ public class World {
     Shader shader;
     Mesh mesh;
     Transformation transformation;
-    Gameobject[] gameobjects;
+    Gameobject[] gameobjects = new Gameobject[5];
 
-//    float[] positions = new float[]{
-//            -0.5f,  0.5f, 0.0f,
-//            -0.5f, -0.5f, 0.0f,
-//            0.5f, -0.5f, 0.0f,
-//            0.5f,  0.5f, 0.0f,
-//    };
+    //square
     float[] positions = new float[]{
             -1.0f,  1.0f, 0.0f,
             -1.0f, -1.0f, 0.0f,
@@ -48,6 +43,54 @@ public class World {
             0.0f, 0.0f, 0.5f,
             0.0f, 0.5f, 0.5f,
     };
+    //square
+
+    //cube
+    float[] positions_cube = new float[] {
+            // VO
+            -0.5f,  0.5f,  0.5f,
+            // V1
+            -0.5f, -0.5f,  0.5f,
+            // V2
+            0.5f, -0.5f,  0.5f,
+            // V3
+            0.5f,  0.5f,  0.5f,
+            // V4
+            -0.5f,  0.5f, -0.5f,
+            // V5
+            0.5f,  0.5f, -0.5f,
+            // V6
+            -0.5f, -0.5f, -0.5f,
+            // V7
+            0.5f, -0.5f, -0.5f,
+    };
+
+    float[] colors_cube = new float[]{
+            0.5f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f,
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.5f, 0.5f,
+            0.5f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f,
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.5f, 0.5f,
+    };
+
+    int[] indices_cube = new int[] {
+            // Front face
+            0, 1, 3, 3, 1, 2,
+            // Top Face
+            4, 0, 3, 5, 4, 3,
+            // Right face
+            3, 2, 7, 5, 3, 7,
+            // Left face
+            6, 1, 0, 6, 0, 4,
+            // Bottom face
+            2, 1, 6, 2, 6, 7,
+            // Back face
+            7, 6, 4, 7, 4, 5,
+    };
+    //cube
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -67,10 +110,23 @@ public class World {
             System.out.println("Shader loading error: " + e);
         }
 
-        mesh = new Mesh(positions,indices,colors);
+        mesh = new Mesh(positions_cube,indices_cube,colors_cube);
         Gameobject testGameObject = new Gameobject(mesh);
-        testGameObject.setPosition(0, 0, -10);
-        gameobjects = new Gameobject[] { testGameObject };
+        Gameobject testGameObject2 = new Gameobject(mesh);
+        Gameobject testGameObject3 = new Gameobject(mesh);
+
+        gameobjects = new Gameobject[5];
+        gameobjects[0] = new Gameobject(mesh);
+        gameobjects[1] = new Gameobject(mesh);
+        gameobjects[2] = new Gameobject(mesh);
+        gameobjects[3] = new Gameobject(mesh);
+        gameobjects[4] = new Gameobject(mesh);
+
+        gameobjects[0].setPosition(0,0,-10);
+        gameobjects[1].setPosition(0,3,-10);
+        gameobjects[2].setPosition(0,-3,-10);
+        gameobjects[3].setPosition(3,0,-10);
+        gameobjects[4].setPosition(-3,0,-10);
     }
 
     private void gameLoop() {
@@ -100,7 +156,13 @@ public class World {
     }
 
     private void update(float delta) {
-
+        for(Gameobject gameobject: gameobjects) {
+            float rotation = gameobject.getRotation().x + 1.5f;
+            if ( rotation > 360 ) {
+                rotation = 0;
+            }
+            gameobject.setRotation(rotation, rotation, rotation);
+        }
     }
 
     private void render(float alpha) {

@@ -102,6 +102,7 @@ public class Window {
         }
         // Set the clear color
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glEnable(GL_DEPTH_TEST);
     }
 
     public static void destroy() {
@@ -140,7 +141,7 @@ public class Window {
     }
 
     public static void clear() {
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     public static void update() {
