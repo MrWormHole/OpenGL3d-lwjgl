@@ -1,4 +1,5 @@
 import com.sun.prism.impl.VertexBuffer;
+import org.joml.Matrix4f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -23,6 +24,8 @@ public class World {
     Timer timer;
     Shader shader;
     Mesh mesh;
+    Transformation transformation;
+    Gameobject[] gameobjects;
 
 //    float[] positions = new float[]{
 //            -0.5f,  0.5f, 0.0f,
@@ -56,6 +59,7 @@ public class World {
     private void init() {
         Window.create(600,800,"World Experiments", true);
         timer = new Timer();
+        transformation = new Transformation();
 
         try {
             shader = new Shader("./shaders/rainbow.vs","./shaders/rainbow.fs");
@@ -64,6 +68,9 @@ public class World {
         }
 
         mesh = new Mesh(positions,indices,colors);
+        Gameobject testGameObject = new Gameobject(mesh);
+        testGameObject.setPosition(0, 0, -10);
+        gameobjects = new Gameobject[] { testGameObject };
     }
 
     private void gameLoop() {
@@ -104,15 +111,24 @@ public class World {
             Window.setResized(false);
         }
 
-        shader.bind(); //for now testing only one shader
-        glBindVertexArray(mesh.getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+        shader.bind();
 
-        glDisableVertexAttribArray(0);
-        glBindVertexArray(0);
-        shader.unbind(); //for now testing only one shader
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix((float) Math.toRadians(60.0f), Window.getWidth(), Window.getHeight(), 0.01f, 1000.f);
+        shader.setUniform("projectionMatrix", projectionMatrix);
+
+        for(Gameobject gameobject: gameobjects) {
+            ///outside of the scope for rendering
+            // Set world matrix for this
+            Matrix4f worldMatrix = transformation.getWorldMatrix(
+                    gameobject.getPosition(),
+                    gameobject.getRotation(),
+                    gameobject.getScale());
+            shader.setUniform("worldMatrix", worldMatrix);
+            // Render the mesh for this
+            gameobject.getMesh().render();
+        }
+
+        shader.unbind();
 
         Window.update();
     }
