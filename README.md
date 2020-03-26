@@ -13,3 +13,6 @@
 # Sample Gifs
 ##### 3D rotating cubes
 ![cubes](https://user-images.githubusercontent.com/22800416/77656973-882ca600-6f6c-11ea-94ce-15986216065a.gif)
+
+##### 3D textured cubes
+!![grass_cubes](https://user-images.githubusercontent.com/22800416/77687027-bd99b980-6f95-11ea-81ce-f342852b7cfd.gif)

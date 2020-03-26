@@ -27,6 +27,7 @@ public class Shader {
         link();
         createUniform("projectionMatrix");
         createUniform("worldMatrix");
+        createUniform("textureSampler");
     }
 
     public void createUniform(String uniformName) throws Exception {
@@ -42,6 +43,10 @@ public class Shader {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16)));
         }
+    }
+
+    public void setUniform(String uniformName, int value) {
+        glUniform1i(uniforms.get(uniformName), value);
     }
 
     public void createVertexShader(String shaderCode) throws Exception {
