@@ -1,5 +1,6 @@
 import com.sun.prism.impl.VertexBuffer;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
@@ -28,11 +29,12 @@ public class World {
     Mesh mesh;
     Transformation transformation;
     Gameobject[] gameobjects;
+    Camera camera;
+    Vector3f cameraVelocity;
+    MouseInput mouseInput;
 
-    private int displxInc;
-    private int displyInc;
-    private int displzInc;
-    private int scaleInc;
+    private static final float MOUSE_SENSITIVITY = 0.25f;
+    private static final float CAMERA_POSITION_STEP = 0.05F;
 
     //square
     float[] positions = new float[]{
@@ -160,9 +162,12 @@ public class World {
     }
 
     private void init() {
-        Window.create(600,800,"World Experiments", true);
+        long window = Window.create(600,800,"World Experiments", true);
+        mouseInput = new MouseInput(window);
         timer = new Timer();
         transformation = new Transformation();
+        camera = new Camera();
+        cameraVelocity = new Vector3f();
 
         try {
             shader = new Shader("./shaders/textured.vs","./shaders/textured.fs");
@@ -209,50 +214,35 @@ public class World {
     }
 
     private void input() {
-        displyInc = 0;
-        displxInc = 0;
-        displzInc = 0;
-        scaleInc = 0;
-        if (Window.isKeyPressed(GLFW_KEY_UP)) {
-            displyInc = 1;
-        } else if (Window.isKeyPressed(GLFW_KEY_DOWN)) {
-            displyInc = -1;
-        } else if (Window.isKeyPressed(GLFW_KEY_LEFT)) {
-            displxInc = -1;
-        } else if (Window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            displxInc = 1;
-        } else if (Window.isKeyPressed(GLFW_KEY_A)) {
-            displzInc = -1;
-        } else if (Window.isKeyPressed(GLFW_KEY_Q)) {
-            displzInc = 1;
-        } else if (Window.isKeyPressed(GLFW_KEY_Z)) {
-            scaleInc = -1;
-        } else if (Window.isKeyPressed(GLFW_KEY_X)) {
-            scaleInc = 1;
+        mouseInput.input();
+
+        cameraVelocity.set(0,0,0);
+        if (Window.isKeyPressed(GLFW_KEY_UP) || Window.isKeyPressed(GLFW_KEY_W)) {
+            cameraVelocity.z -= 1;
+        }
+        else if (Window.isKeyPressed(GLFW_KEY_DOWN) || Window.isKeyPressed(GLFW_KEY_S)) {
+            cameraVelocity.z += 1;
+        }
+        else if (Window.isKeyPressed(GLFW_KEY_LEFT) || Window.isKeyPressed(GLFW_KEY_A)) {
+            cameraVelocity.x -= 1;
+        }
+        else if (Window.isKeyPressed(GLFW_KEY_RIGHT) || Window.isKeyPressed(GLFW_KEY_D)) {
+            cameraVelocity.x += 1;
+        }
+        else if (Window.isKeyPressed(GLFW_KEY_Z)) {
+            cameraVelocity.y -= 1;
+        }
+        else if (Window.isKeyPressed(GLFW_KEY_X)) {
+            cameraVelocity.y += 1;
         }
     }
 
     private void update(float delta) {
-        for(Gameobject gameobject: gameobjects) {
-            // Update position
-            Vector3f gameobjectPosition = gameobject.getPosition();
-            float posx = gameobjectPosition.x + displxInc * 0.01f;
-            float posy = gameobjectPosition.y + displyInc * 0.01f;
-            float posz = gameobjectPosition.z + displzInc * 0.01f;
-            gameobject.setPosition(posx, posy, posz);
+        camera.movePosition(cameraVelocity.x * CAMERA_POSITION_STEP, cameraVelocity.y * CAMERA_POSITION_STEP, cameraVelocity.z * CAMERA_POSITION_STEP);
 
-            float scale = gameobject.getScale();
-            scale += scaleInc * 0.05f;
-            if (scale < 0) {
-                scale = 0;
-            }
-            gameobject.setScale(scale);
-
-            float rotation = gameobject.getRotation().x + 1.5f;
-            if ( rotation > 360 ) {
-                rotation = 0;
-            }
-            gameobject.setRotation(rotation, rotation, rotation);
+        if (mouseInput.isRightButtonPressed()) {
+            Vector2f mouseVelocity = mouseInput.getMouseVelocity();
+            camera.moveRotation(mouseVelocity.x * MOUSE_SENSITIVITY, mouseVelocity.y * MOUSE_SENSITIVITY, 0);
         }
     }
 
@@ -265,19 +255,19 @@ public class World {
         }
 
         shader.bind();
-
+        // Update projection matrix
         Matrix4f projectionMatrix = transformation.getProjectionMatrix((float) Math.toRadians(60.0f), Window.getWidth(), Window.getHeight(), 0.01f, 1000.f);
         shader.setUniform("projectionMatrix", projectionMatrix);
+
+        // Update view matrix
+        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+
         shader.setUniform("textureSampler",0);
 
         for(Gameobject gameobject: gameobjects) {
-            ///outside of the scope for rendering
-            // Set world matrix for this
-            Matrix4f worldMatrix = transformation.getWorldMatrix(
-                    gameobject.getPosition(),
-                    gameobject.getRotation(),
-                    gameobject.getScale());
-            shader.setUniform("worldMatrix", worldMatrix);
+            // Set model-view matrix for this
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameobject, viewMatrix);
+            shader.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mesh for this
             gameobject.getMesh().render();
         }
